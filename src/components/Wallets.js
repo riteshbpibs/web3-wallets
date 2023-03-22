@@ -66,7 +66,7 @@ const Wallets = (props) => {
         let provider = window.ethereum;
         metamaskProvider(provider);
       } else {
-        window.location.reload(`https://metamask.app.link/dapp/${location}`);
+        window.location.replace(`https://metamask.app.link/dapp/${location}`);
       }
     }
   };
@@ -134,7 +134,7 @@ const Wallets = (props) => {
       if (name === "coinbase" && window?.ethereum?.isCoinbaseBrowser) {
         connect(name, connector);
       } else if (name === "coinbase" && !window?.ethereum?.isCoinbaseBrowser) {
-        window.location.reload(`https://go.cb-w.com/dapp?cb_url=${location}`);
+        window.location.replace(`https://go.cb-w.com/dapp?cb_url=${location}`);
       } else if (name === "walletConnect") {
         connect(name, connector);
       }
