@@ -229,11 +229,14 @@ function App() {
 
   return (
     <>
+      <h5 className="w-100 text-center mt-3">
+        Web app is built on:{" "}
+        {tiamondsChainId === 1 ? "Ethereum Mainnet" : "Goerli"}
+      </h5>
       <div className="App">
         {isSwitchModalOpen && (
           <SwitchModal show={isSwitchModalOpen} handleClose={handleClose} />
         )}
-        <h1>{tiamondsChainId}</h1>
         <div style={{ margin: "0 0 50px 0" }}>
           {address && (
             <>
