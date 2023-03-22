@@ -64,7 +64,7 @@ function App() {
         method: "wallet_switchEthereumChain",
         params: [
           {
-            chainId: `0x${Number(tiamondsChainId).toString(16)}`,
+            chainId: `0x${tiamondsChainId}`,
           },
         ],
       });
@@ -233,6 +233,7 @@ function App() {
         {isSwitchModalOpen && (
           <SwitchModal show={isSwitchModalOpen} handleClose={handleClose} />
         )}
+        <h1>{tiamondsChainId}</h1>
         <div style={{ margin: "0 0 50px 0" }}>
           {address && (
             <>
