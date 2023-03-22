@@ -128,13 +128,12 @@ function App() {
     setLibrary(null);
     setChainId(null);
     setWalletName("");
-    deleteLocalStorage("walletName");
+    deleteLocalStorage("walletInfo");
   };
 
   // To listen to account and chainId change in wallet........................
   useEffect(() => {
     const listenChainChanged = (chainId) => {
-      console.log(Number(chainId));
       setChainId(Number(chainId));
     };
 
@@ -147,7 +146,7 @@ function App() {
           setWalletName("");
         }
 
-        deleteLocalStorage("walletName");
+        deleteLocalStorage("walletInfo");
       } else {
         setAddress(acc[0]);
       }
@@ -173,36 +172,42 @@ function App() {
 
   // To check wallet connection when refresh the page.....................
   const checkWalletConnection = () => {
-    if (getLocalStorage("walletName") === "metamask") {
-      if (
-        window.ethereum?.isMetaMask ||
-        window.ethereum?.providerMap?.get("MetaMask")
-      ) {
-        let provider =
-          window.ethereum?.providerMap?.get("MetaMask") || window.ethereum;
+    const walletInfo = JSON.parse(getLocalStorage("walletInfo"));
+    if (walletInfo) {
+      if (Date.now() <= walletInfo.time + 86400000) {
+        if (walletInfo?.name === "metamask") {
+          if (
+            window.ethereum?.isMetaMask ||
+            window.ethereum?.providerMap?.get("MetaMask")
+          ) {
+            let provider =
+              window.ethereum?.providerMap?.get("MetaMask") || window.ethereum;
 
-        provider
-          .request({ method: "eth_requestAccounts" })
-          .then((addresses) => {
-            setAddress(addresses[0]);
-            setWalletName("metamask");
-            setLibrary(new Web3(provider));
-            provider.request({ method: "eth_chainId" }).then((id) => {
-              setChainId(Number(id));
-            });
-          });
-      }
-    } else {
-      if (getLocalStorage("walletName")) {
-        let oldConnector;
-        const walletName = getLocalStorage("walletName");
-        if (walletName === "coinbase") {
-          oldConnector = connectors.coinbaseWallet;
-        } else if (walletName === "walletConnect") {
-          oldConnector = connectors.walletConnect;
+            provider
+              .request({ method: "eth_requestAccounts" })
+              .then((addresses) => {
+                setAddress(addresses[0]);
+                setWalletName("metamask");
+                setLibrary(new Web3(provider));
+                provider.request({ method: "eth_chainId" }).then((id) => {
+                  setChainId(Number(id));
+                });
+              });
+          }
+        } else {
+          let oldConnector;
+          const walletName = walletInfo.name;
+
+          if (walletName === "coinbase") {
+            oldConnector = connectors.coinbaseWallet;
+          } else if (walletName === "walletConnect") {
+            oldConnector = connectors.walletConnect;
+          }
+
+          web3WalletConnect(walletName, oldConnector);
         }
-
-        web3WalletConnect(walletName, oldConnector);
+      } else {
+        handleDisconnect();
       }
     }
   };
@@ -231,7 +236,8 @@ function App() {
     <>
       <h5 className="w-100 text-center mt-3">
         Web app is built on:{" "}
-        {tiamondsChainId === 1 ? "Ethereum Mainnet" : "Goerli"}
+        {Number(tiamondsChainId) === 1 && "Ethereum Mainnet"}
+        {Number(tiamondsChainId) === 5 && "Goerli"}
       </h5>
       <div className="App">
         {isSwitchModalOpen && (

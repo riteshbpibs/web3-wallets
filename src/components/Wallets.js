@@ -36,8 +36,14 @@ const Wallets = (props) => {
 
   useEffect(() => {
     if (account) {
-      if (!getLocalStorage("walletName")) {
-        setLocalStorage("walletName", walletName);
+      if (!getLocalStorage("walletInfo")) {
+        setLocalStorage(
+          "walletInfo",
+          JSON.stringify({
+            name: walletName,
+            time: Date.now(),
+          })
+        );
       }
     }
   }, [account, walletName]);
@@ -73,7 +79,13 @@ const Wallets = (props) => {
         setAddress(address[0]);
         setWalletName("metamask");
         setLibrary(new Web3(provider));
-        setLocalStorage("walletName", "metamask");
+        setLocalStorage(
+          "walletInfo",
+          JSON.stringify({
+            name: "metamask",
+            time: Date.now(),
+          })
+        );
         let chainId = await provider.request({ method: "eth_chainId" });
         if (chainId) {
           setChainId(Number(chainId));
@@ -155,7 +167,7 @@ const Wallets = (props) => {
     setLibrary(null);
     setChainId(null);
     setWalletName("");
-    deleteLocalStorage("walletName");
+    deleteLocalStorage("walletInfo");
   };
 
   return (
