@@ -215,9 +215,6 @@ function App() {
       })
       .catch((error) => {
         if (error) {
-          activate(connector);
-          return;
-        } else {
           setPendingError(true);
           return;
         }

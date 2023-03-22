@@ -1,10 +1,14 @@
 import Web3 from "web3";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { connectors } from "./connectors";
 import { useWeb3React } from "@web3-react/core";
 import { isMobile, isTablet } from "react-device-detect";
 import { ConnectWalletContext } from "./ConnectWalletContext";
-import { deleteLocalStorage, setLocalStorage } from "../helpers";
+import {
+  deleteLocalStorage,
+  getLocalStorage,
+  setLocalStorage,
+} from "../helpers";
 
 // eslint-disable-next-line no-unused-vars
 import { Web3Modal } from "@web3modal/react";
@@ -30,6 +34,14 @@ const Wallets = (props) => {
   const tiamondsChainId = process.env.REACT_APP_CHAIN_ID;
   const location = window.location.href.split("//")[1];
 
+  useEffect(() => {
+    if (account) {
+      if (!getLocalStorage("walletName")) {
+        setLocalStorage("walletName", walletName);
+      }
+    }
+  }, [account, walletName]);
+
   // Custom function for metamask connection............................
   const metamaskConnect = () => {
     if (!isMobile || !isTablet) {
@@ -48,7 +60,7 @@ const Wallets = (props) => {
         let provider = window.ethereum;
         metamaskProvider(provider);
       } else {
-        window.location.replace(`https://metamask.app.link/dapp/${location}`);
+        window.location.reload(`https://metamask.app.link/dapp/${location}`);
       }
     }
   };
@@ -109,8 +121,10 @@ const Wallets = (props) => {
     } else {
       if (name === "coinbase" && window?.ethereum?.isCoinbaseBrowser) {
         connect(name, connector);
-      } else {
-        window.location.replace(`https://go.cb-w.com/dapp?cb_url=${location}`);
+      } else if (name === "coinbase" && !window?.ethereum?.isCoinbaseBrowser) {
+        window.location.reload(`https://go.cb-w.com/dapp?cb_url=${location}`);
+      } else if (name === "walletConnect") {
+        connect(name, connector);
       }
     }
   };
@@ -122,13 +136,9 @@ const Wallets = (props) => {
         setAddress(account);
         setWalletName(name);
         setLibrary(web3Library);
-        setLocalStorage("walletName", name);
       })
       .catch((error) => {
         if (error) {
-          activate(connector);
-          return;
-        } else {
           setPendingError(true);
           return;
         }
