@@ -50,7 +50,7 @@ const Wallets = (props) => {
 
   // Custom function for metamask connection............................
   const metamaskConnect = () => {
-    if (!isMobile || !isTablet) {
+    if (!(isMobile || isTablet)) {
       if (
         window.ethereum?.isMetaMask ||
         window.ethereum?.providerMap?.get("MetaMask")
