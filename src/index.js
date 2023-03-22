@@ -3,13 +3,23 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import ConnectWalletProvider from "./ConnectWalletContext";
+import ConnectWalletProvider from "./components/ConnectWalletContext";
+import { Web3ReactProvider } from "@web3-react/core";
+import Web3 from "web3";
+
+const getLibrary = (provider) => {
+  const library = new Web3(provider);
+  library.pollingInterval = 8000; // frequency provider is polling
+  return library;
+};
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <ConnectWalletProvider>
-      <App />
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <App />
+      </Web3ReactProvider>
     </ConnectWalletProvider>
   </React.StrictMode>
 );
